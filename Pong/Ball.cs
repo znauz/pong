@@ -23,7 +23,7 @@ namespace Pong
             Texture = texture;
             rand = new Random();
             //direction = startDirs[rand.Next(startDirs.Length)];
-            direction = startDirs[3]; // bottom edge
+            direction = startDirs[1]; // bottom edge
             //direction = startDirs[2]; // Top edge!!
             radius = texture.Width / 2;
             StartPos = startPos;

@@ -21,9 +21,17 @@ namespace Pong
         public Paddle player1;
         public Paddle player2;
         public SoundEffect hitWall;
+        public GameState currentGameState = GameState.Menu;
         public SoundEffect hitPaddle;
         public Vector2 playerScore;
+        
 
+    public enum GameState
+        {
+            Menu,
+            Game,
+            Paused
+        }
 
 
         public void ScoreP1()
@@ -104,36 +112,55 @@ namespace Pong
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
+            switch(currentGameState)
+            {
+                case GameState.Menu:
+                    
+                    break;
+
+                case GameState.Game:
+                    ball.Update(gameTime);
+                    CheckCollision();
+                    player1.Update(gameTime);
+                    player2.Update(gameTime);
+                    KeyboardState newState = Keyboard.GetState();
+                    if (newState.IsKeyDown(Keys.W))
+                    {
+
+                        player1.Up(bounds);
+                    }
+                    if (newState.IsKeyDown(Keys.S))
+                    {
+
+                        player1.Down(bounds);
+                    }
+
+                    if (newState.IsKeyDown(Keys.Up))
+                    {
+
+                        player2.Up(bounds);
+                    }
+                    if (newState.IsKeyDown(Keys.Down))
+                    {
+                        player2.Down(bounds);
+                    }
+                    break;
+
+
+                case GameState.Paused:
+                    break;
+
+
+                
+            }
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             // TODO: Add your update logic here
             //animatedSprite.Update();
-            ball.Update(gameTime);
-            CheckCollision();
-            player1.Update(gameTime);
-            player2.Update(gameTime);
-            KeyboardState newState = Keyboard.GetState();
-            if (newState.IsKeyDown(Keys.W))
-            {
 
-                player1.Up(bounds);
-            }
-            if (newState.IsKeyDown(Keys.S))
-            { 
-
-                player1.Down(bounds);
-            }
-
-            if (newState.IsKeyDown(Keys.Up))
-            {
-
-                player2.Up(bounds);
-            }
-            if (newState.IsKeyDown(Keys.Down))
-            { 
-                player2.Down(bounds);
-            }
             base.Update(gameTime);
         }
 
@@ -146,6 +173,7 @@ namespace Pong
             float player2Bot = player2.Texture.Height + player2.position.Y;
             float player1Edge = player1.position.X + player1.Texture.Width / 2;
             float player2Edge = player2.position.X - player2.Texture.Width / 2;
+            float ballPos = ball.position.Y + ball.radius;
             int extra = 50; // to make the ball go out a bit more
 
 
@@ -188,7 +216,7 @@ namespace Pong
             }
 
 
-            else if (ball.position.X - ball.radius <= player1Edge && ball.position.Y + ball.radius <= player1Bot && ball.direction.Y < 0 && !(ball.position.Y - player1.position.Y < 0) && !(ball.position.Y < player1Bot))
+            else if (ball.position.X - ball.radius <= player1Edge && ball.position.Y + ball.radius <= player1Bot && ball.direction.Y < 0 && !(ball.position.Y - player1.position.Y < 0) && !(ball.position.Y+ball.radius*2 < player1Bot))
             {
                 // other edge case
                 // touching left paddle bottom edge
@@ -258,15 +286,40 @@ namespace Pong
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-            double time = gameTime.ElapsedGameTime.TotalSeconds;
-            spriteBatch.Draw(background, new Rectangle(0, 0, 800, 480), Color.White);
-            spriteBatch.DrawString(font, playerScore.X.ToString(), new Vector2(200, 0), Color.White);
-            spriteBatch.DrawString(font, playerScore.Y.ToString(), new Vector2(500, 0), Color.White);
-            spriteBatch.End();
-            ball.Draw(spriteBatch);
-            player1.Draw(spriteBatch);
-            player2.Draw(spriteBatch);
+
+
+            switch (currentGameState)
+            {
+                case GameState.Menu:
+                    spriteBatch.Begin();
+                    spriteBatch.DrawString(font, "Basic Pong", new Vector2(250, 0), Color.Red);
+                    spriteBatch.End();
+                    break;
+
+                case GameState.Game:
+                    spriteBatch.Begin();
+                    //double time = gameTime.ElapsedGameTime.TotalSeconds;
+                    spriteBatch.Draw(background, new Rectangle(0, 0, 800, 480), Color.Gray);
+                    spriteBatch.DrawString(font, (playerScore.X.ToString()), new Vector2(200, 0), Color.White);
+                    spriteBatch.DrawString(font, (playerScore.Y.ToString()), new Vector2(500, 0), Color.White);
+                    spriteBatch.End();
+                    ball.Draw(spriteBatch);
+                    player1.Draw(spriteBatch);
+                    player2.Draw(spriteBatch);
+                    break;
+
+
+                case GameState.Paused:
+                    spriteBatch.DrawString(font, "This is paused", new Vector2(200, 0), Color.White);
+                    spriteBatch.End();
+                    break;
+
+
+
+            }
+
+
+
 
 
             base.Draw(gameTime);

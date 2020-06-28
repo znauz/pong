@@ -27,10 +27,6 @@ namespace Pong
             //Rectangle.Y = (int)position.Y;
         }
 
-        public void checkCollision()
-        {
-
-        }
 
         public void Up(Rectangle bounds)
         {
@@ -43,7 +39,7 @@ namespace Pong
 
         public void Down(Rectangle bounds)
         {
-            if(position.Y + Rectangle.Height - bounds.Bottom == 0)
+            if(position.Y + Texture.Height - bounds.Bottom == 0)
             {
                 return;
             }
